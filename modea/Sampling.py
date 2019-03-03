@@ -69,7 +69,7 @@ class QuasiGaussianSobolSampling(object):
         self.n = n
         self.shape = (n,1) if shape == 'col' else (1,n)
         if seed is None or seed < 2:
-            self.seed = np.random.randint(2, n**2)  # seed=1 will give a null-vector as first result
+            self.seed = np.random.randint(2, max(3, n**2))  # seed=1 will give a null-vector as first result
         else:
             self.seed = seed
 
