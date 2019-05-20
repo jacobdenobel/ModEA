@@ -1,11 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "ResearchProj"
-		},
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "ResearchProj"
+    },
+    {
+      "path": "."
+    },
+    {
+      "path": "venv"
+    }
+  ],
+  "settings": {}
 }

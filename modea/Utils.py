@@ -16,7 +16,7 @@ from functools import total_ordering
 # The following list contains all possible options from which the Evolving ES can choose.
 # To give this list a 'constant' property, it is defined as a tuple (i.e. immutable)
 options = (
-    #'Name',           (Tuple, of, options),                  Number of associated parameters
+    # 'Name',           (Tuple, of, options),                  Number of associated parameters
     ('active',         (False, True),                         0),
     ('elitist',        (False, True),                         0),
     ('mirrored',       (False, True),                         0),
@@ -40,6 +40,7 @@ initializable_parameters = (
 
 num_options_per_module = [len(opt[1]) for opt in options]
 
+
 def getVals(init_values):
     """
         Transformation from real numbered vector to values dictionary
@@ -48,8 +49,10 @@ def getVals(init_values):
         :return:            Dictionary containing name-indexed initial parameter values
     """
 
-    values = {initializable_parameters[i]: val for i, val in enumerate(init_values) if val is not None}
+    values = {initializable_parameters[i]: val for i, val in enumerate(
+        init_values) if val is not None}
     return values
+
 
 def getOpts(bitstring):
     """
@@ -59,8 +62,10 @@ def getOpts(bitstring):
         :return:            Dictionary with all option names and the chosen option
     """
 
-    opts = {option[0]: option[1][int(bitstring[i])] for i, option in enumerate(options)}
+    opts = {option[0]: option[1][int(bitstring[i])]
+            for i, option in enumerate(options)}
     return opts
+
 
 def getBitString(opts):
     """
@@ -82,6 +87,7 @@ def getBitString(opts):
 
     return bitstring
 
+
 def getFullOpts(opts):
     """
         Ensures that an options dictionary actually contains all options that have been defined. Any missing options
@@ -100,6 +106,7 @@ def getFullOpts(opts):
         if name not in opts:
             opts[name] = choices[0]
 
+
 def getPrintName(opts):
     """
         Create a human-readable name from an options dictionary
@@ -117,10 +124,12 @@ def getPrintName(opts):
     tpa = 'TPA-' if opts['tpa'] else ''
     seq = 'Sequential ' if opts['sequential'] else ''
     ipop = '{}-'.format(opts['ipop']) if opts['ipop'] is not None else ''
-    weight = '${}$-weighted '.format(opts['weights_option']) if opts['weights_option'] is not None else ''
+    weight = '${}$-weighted '.format(opts['weights_option']
+                                     ) if opts['weights_option'] is not None else ''
 
     sel = 'Pairwise selection' if opts['selection'] == 'pairwise' else ''
-    sampler = 'a {} sampler'.format(opts['base-sampler']) if opts['base-sampler'] is not None else ''
+    sampler = 'a {} sampler'.format(
+        opts['base-sampler']) if opts['base-sampler'] is not None else ''
 
     if len(sel) + len(sampler) > 0:
         append = ' with {}'
@@ -222,7 +231,8 @@ def create_bounds(values, percentage):
         :return:            Tuple (u_bound, l_bound), each a regular list.
     """
     if percentage <= 0 or percentage >= 1:
-        raise ValueError("Argument 'percentage' is expected to be a float from the range (0, 1).")
+        raise ValueError(
+            "Argument 'percentage' is expected to be a float from the range (0, 1).")
 
     u_perc = 1 + percentage
     l_perc = 1 - percentage
@@ -292,17 +302,20 @@ class ESFitness(object):
         :param std_dev_ERT:     Standard deviation corresponding to the ERT value
         :param std_dev_FCE:     Standard deviation corresponding to the FCE value
     """
+
     def __init__(self, fitnesses=None, target=1e-8,                                # Original values
                  min_fitnesses=None, min_indices=None, num_successful=None,        # Summary values
                  ERT=None, FCE=float('inf'), std_dev_ERT=None, std_dev_FCE=None):  # Human-readable values
 
         # If original fitness values are given, calculate everything from scratch
         if fitnesses is not None:
-            min_fitnesses, min_indices, num_successful = self._preCalcFCEandERT(fitnesses, target)
+            min_fitnesses, min_indices, num_successful = self._preCalcFCEandERT(
+                fitnesses, target)
 
         # If 'summary data' is available, calculate ERT, FCE and its std_dev using the summary data
         if min_fitnesses is not None and min_indices is not None and num_successful is not None:
-            ERT, FCE, std_dev_ERT, std_dev_FCE = self._calcFCEandERT(min_fitnesses, min_indices, num_successful)
+            ERT, FCE, std_dev_ERT, std_dev_FCE = self._calcFCEandERT(
+                min_fitnesses, min_indices, num_successful)
 
         # The interesting values to display or use as comparison
         self.ERT = ERT                              # Expected Running Time
@@ -355,7 +368,6 @@ class ESFitness(object):
 
     __str__ = __unicode__
 
-
     @staticmethod
     def _preCalcFCEandERT(fitnesses, target):
         """
@@ -365,7 +377,8 @@ class ESFitness(object):
             :param target:      Target value to use for basing the ERT on. Default: 1e-8
             :return:            ESFitness object with FCE and ERT properly set
         """
-        min_fitnesses = np.min(fitnesses, axis=1).tolist()  # Save as list to ensure eval() can read it as summary
+        min_fitnesses = np.min(fitnesses, axis=1).tolist(
+        )  # Save as list to ensure eval() can read it as summary
 
         num_runs, num_evals = fitnesses.shape
         below_target = fitnesses < target
@@ -384,7 +397,6 @@ class ESFitness(object):
 
         return min_fitnesses, min_indices, num_successful
 
-
     @staticmethod
     def _calcFCEandERT(min_fitnesses, min_indices, num_successful):
         """
@@ -402,7 +414,8 @@ class ESFitness(object):
 
         ### ERT ###
         # If none of the runs reached the target, there is no (useful) ERT to be calculated
-        ERT = np.sum(min_indices) / num_successful if num_successful != 0 else None
+        ERT = np.sum(min_indices) / \
+            num_successful if num_successful != 0 else None
         std_dev_ERT = np.std(min_indices)
 
         return ERT, FCE, std_dev_ERT, std_dev_FCE
